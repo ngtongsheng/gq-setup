@@ -1,6 +1,6 @@
 # Set up your computer
 
-About 10 minutes. Tong Sheng sits beside you the first time.
+About 45 to 60 minutes in total: about 10 for the steps below, then 30 to 45 while Claude sets up your computer (you mostly wait and press **Allow**). Tong Sheng sits beside you the first time.
 
 1. Open https://claude.com/download and press **Download for macOS**. Open the file that downloads and drag **Claude** into **Applications**.
 2. Open **Claude** from Applications. Sign in with your Claude account.

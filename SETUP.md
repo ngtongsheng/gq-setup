@@ -12,8 +12,8 @@ first and skips when it is already done. Re-running is the repair path.
 - Before every command, one sentence on what it does in her words, then: "A permission box will appear; press
   **Allow**." Then run it.
 - Every choice is an AskUserQuestion prompt with the recommended option first. Never ask her to type a command.
-- After each step, one status line: "Step 3 of 8 done: GitHub tool ready." When a check shows a step is already
-  done, say so the same way: "Step 3 of 8 already done."
+- After each step, one status line: "Step 3 of 9 done: GitHub tool ready." When a check shows a step is already
+  done, say so the same way: "Step 3 of 9 already done."
 - Show her command output only when she has to act on it (the sign-in code in step 5).
 
 ## How to run commands
@@ -23,7 +23,7 @@ first and skips when it is already done. Re-running is the repair path.
   [When a step fails twice](#when-a-step-fails-twice).
 
 ## 0. Greet
-Say: "Hi! I'll set up your computer for the GQ CRM. It takes about 30 minutes. I'll explain each step before I do it,
+Say: "Hi! I'll set up your computer for the GQ CRM. It takes about 30 to 45 minutes. I'll explain each step before I do it,
 and you'll press **Allow** a few times. Tong Sheng can help if anything gets stuck."
 Ask (AskUserQuestion) "Ready to start?" with options **Yes** / **Not now**. Not now: say "No problem. Paste the same
 message again whenever you're ready." and stop.
@@ -81,7 +81,11 @@ message again whenever you're ready." and stop.
   it, press **Continue**, then **Authorize GitHub CLI**. Tell me when the page says you're all set."
 - Wait for the background command to finish. Verify: `~/.local/bin/mise exec -- gh auth status` succeeds.
 - Git setup (always run; both are safe to repeat):
-  - `~/.local/bin/mise exec -- gh auth setup-git`
+  - Let git use her GitHub sign-in. Do not run `gh auth setup-git`: it writes the versioned path of the gh install
+    (`.../installs/gh/2.x.y/...`) into `~/.gitconfig`, and that path breaks when gh is updated. Use the stable shim path:
+    `git config --global --replace-all credential.https://github.com.helper ''` then
+    `git config --global --add credential.https://github.com.helper '!$HOME/.local/share/mise/shims/gh auth git-credential'`
+    (single quotes, written exactly so; the first line clears any older helper, so repeating is safe).
   - Identity (D7: GitHub's private email, so her own email stays out of the CRM's history). Read
     `~/.local/bin/mise exec -- gh api user --jq '.login, .id, (.name // .login)'`. Check `git config --global user.email`: ends in
     `@users.noreply.github.com` → skip. Otherwise:
