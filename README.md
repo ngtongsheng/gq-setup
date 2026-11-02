@@ -15,7 +15,7 @@
    https://github.com/ngtongsheng/gq-setup
    ```
 
-Claude explains each step and asks before doing it. Press **Allow** each time. It takes about 30 to 45 minutes.
+Claude explains each step and asks before doing it. Press **Allow** each time. It takes about 40 to 55 minutes.
 
 ## If something goes wrong
 
