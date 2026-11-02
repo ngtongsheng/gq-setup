@@ -51,13 +51,15 @@ def pull_setup_repo():
         return
 
     def git(*args):
-        return subprocess.run(
+        result = subprocess.run(
             ["/usr/bin/git", "-C", repo, *args],
             capture_output=True,
             text=True,
             timeout=10,
-            check=True,
-        ).stdout.strip()
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"git {args[0]} failed: {result.stderr.strip()}")
+        return result.stdout.strip()
 
     if git("branch", "--show-current") != "main" or git("status", "--porcelain"):
         say("pull: gq-setup is not on a clean main, left as it is")
