@@ -28,7 +28,7 @@ first and skips when it is already done. Re-running is the repair path.
 Say: "Hi! I'll set up your computer for the GQ CRM. It takes about 30 to 45 minutes. I'll explain each step before I do it,
 and you'll press **Allow** a few times. Tong Sheng can help if anything gets stuck."
 Ask (AskUserQuestion) "Ready to start?" with options **Yes** / **Not now**. Not now: say "No problem. Paste the same
-message again whenever you're ready." and stop.
+link again whenever you're ready." and stop.
 
 ## 1. Apple developer tools (includes git)
 - Check: `xcode-select -p`. Exit 0 → already done; skip to step 2. (This check never opens a popup; `git --version`
@@ -146,13 +146,13 @@ Say, then stop:
 4. Type: **show me the app**
 
 From then on, that folder is where you work on the CRM. If anything in this setup breaks later, open the **GQ** folder
-and paste the same setup message again."
+and paste the setup link again."
 
 The quit and reopen matters: Claude only sees the newly installed tools after a restart.
 
 ## When a step fails twice
 Stop the setup. Say one plain sentence about which step stopped, for example: "I couldn't finish connecting to GitHub."
-Then: "Please take a screenshot of this window and send it to Tong Sheng. Nothing is broken; paste the same setup
-message again after he replies."
+Then: "Please take a screenshot of this window and send it to Tong Sheng. Nothing is broken; paste the setup
+link again after he replies."
 Leave her files and folders exactly as they are, and use only the commands in this file: Tong Sheng fixes anything
 beyond them.
