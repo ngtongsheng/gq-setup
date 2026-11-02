@@ -17,8 +17,10 @@ first and skips when it is already done. Re-running is the repair path.
 - Show her command output only when she has to act on it (the sign-in code in step 5).
 
 ## How to run commands
-- Your shell may not load her profile, so tools from earlier steps are not on the path. Call mise by its full path,
-  `~/.local/bin/mise`, and run every other tool it provides through it: `~/.local/bin/mise exec -- gh ...`.
+- Your shell may not load her profile, so tools from earlier steps are not on the path. Step 2 finds mise and fixes
+  its absolute path as `<mise>`. From then on write that path in place of `<mise>` in every command, and run every
+  other tool it provides through it: `<mise> exec -- gh ...`. Shell state does not carry between commands, so the
+  path is always written out in full.
 - Use only the commands written here. When a step fails, retry it once. When it fails twice, follow
   [When a step fails twice](#when-a-step-fails-twice).
 
@@ -39,24 +41,30 @@ message again whenever you're ready." and stop.
 - Verify: `xcode-select -p && git --version` both succeed.
 
 ## 2. mise (installs the tools the CRM needs)
-- Check: `~/.local/bin/mise --version`. Success → skip the install, go to the profile lines below.
+- Check: find an existing mise, first hit wins:
+  `for p in "$(command -v mise)" ~/.local/bin/mise /opt/homebrew/bin/mise /usr/local/bin/mise; do [ -n "$p" ] && [ -x "$p" ] && { echo "$p"; break; }; done`
+  (the last two cover a mise she already had, which a shell without her profile cannot see). A path printed → that
+  is `<mise>`; skip the install, go to the profile lines below. Nothing printed → install.
 - Explain: "Now a small helper that installs the CRM's tools into your own user folder. No password needed."
-- Act: `curl -fsSL https://mise.run | sh`
-- Verify: `~/.local/bin/mise --version`.
-- Profile lines, so her own sessions find the tools. Check each file first; add only the missing line:
-  - `grep -qF 'mise activate zsh --shims' ~/.zprofile` fails → `echo 'eval "$(~/.local/bin/mise activate zsh --shims)"' >> ~/.zprofile`
-  - `grep -qF 'mise activate zsh)' ~/.zshrc` fails → `echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc`
+- Act: `curl -fsSL https://mise.run | sh`. Then `<mise>` is `~/.local/bin/mise`, written out in full (`/Users/<name>/.local/bin/mise`).
+- Verify: `<mise> --version`.
+- Shims folder `<shims>`: `~/.local/share/mise/shims`, or `$MISE_DATA_DIR/shims` when `MISE_DATA_DIR` is set. Step 5 uses it.
+- Profile lines, so her own sessions find the tools. Check first:
+  `grep -qs 'mise activate' ~/.zprofile ~/.zshrc ~/.zshenv`. Succeeds → she already has an activation line (set up by her
+  or by an earlier run); add nothing. Fails → add both:
+  - `echo 'eval "$(<mise> activate zsh --shims)"' >> ~/.zprofile`
+  - `echo 'eval "$(<mise> activate zsh)"' >> ~/.zshrc`
 
   Explain these together as "two lines so your Mac finds the new tools next time".
 
 ## 3. GitHub tool
-- Check: `~/.local/bin/mise exec -- gh --version`. Success → skip.
+- Check: `<mise> exec -- gh --version`. Success → skip.
 - Explain: "Next, the tool that talks to GitHub, where the CRM is stored."
-- Act: `~/.local/bin/mise use -g gh`
-- Verify: `~/.local/bin/mise exec -- gh --version`.
+- Act: `<mise> use -g gh`
+- Verify: `<mise> exec -- gh --version`.
 
 ## 4. GitHub account
-- Check: `~/.local/bin/mise exec -- gh auth status` succeeds → she already has an account and is signed in; skip to
+- Check: `<mise> exec -- gh auth status` succeeds → she already has an account and is signed in; skip to
   step 5.
 - Ask (AskUserQuestion) "Do you have a GitHub account?" **Yes** / **No, let's make one**.
 - No: run `open https://github.com/signup` (explain: "I'll open the GitHub sign-up page in your browser"), then give
@@ -72,34 +80,37 @@ message again whenever you're ready." and stop.
   Then say: "Your GitHub account is ready."
 
 ## 5. Sign in to GitHub on this Mac
-- Check: `~/.local/bin/mise exec -- gh auth status` succeeds → skip the sign-in, go to git setup below.
+- Check: `<mise> exec -- gh auth status` succeeds → skip the sign-in, go to git setup below.
 - Explain: "Now I'll connect this Mac to your GitHub account. Your browser opens, and you'll see an 8-character code."
-- Act: run `~/.local/bin/mise exec -- gh auth login --web --hostname github.com --git-protocol https --clipboard` in the
+- Act: run `<mise> exec -- gh auth login --web --hostname github.com --git-protocol https --clipboard` in the
   background (`run_in_background`), because it waits until she finishes in the browser. Read its output for the code
   (`XXXX-XXXX`) and the address `https://github.com/login/device`. Run `open https://github.com/login/device`.
 - Tell her, showing the code in bold: "Your code is **XXXX-XXXX** (it's already copied). In the browser page, paste
   it, press **Continue**, then **Authorize GitHub CLI**. Tell me when the page says you're all set."
-- Wait for the background command to finish. Verify: `~/.local/bin/mise exec -- gh auth status` succeeds.
+- Wait for the background command to finish. Verify: `<mise> exec -- gh auth status` succeeds.
 - Git setup (always run; both are safe to repeat):
   - Let git use her GitHub sign-in. Do not run `gh auth setup-git`: it writes the versioned path of the gh install
-    (`.../installs/gh/2.x.y/...`) into `~/.gitconfig`, and that path breaks when gh is updated. Use the stable shim path:
+    (`.../installs/gh/2.x.y/...`) into `~/.gitconfig`, and that path breaks when gh is updated. Use the stable shim path `<shims>` from step 2:
     `git config --global --replace-all credential.https://github.com.helper ''` then
-    `git config --global --add credential.https://github.com.helper '!$HOME/.local/share/mise/shims/gh auth git-credential'`
-    (single quotes, written exactly so; the first line clears any older helper, so repeating is safe).
-  - Identity (D7: GitHub's private email, so her own email stays out of the CRM's history). Read
-    `~/.local/bin/mise exec -- gh api user --jq '.login, .id, (.name // .login)'`. Check `git config --global user.email`: ends in
-    `@users.noreply.github.com` → skip. Otherwise:
+    `git config --global --add credential.https://github.com.helper '!<shims>/gh auth git-credential'`
+    (single quotes; write `<shims>` out in full, with `$HOME` for her home folder; the first line clears any older
+    helper, so repeating is safe).
+  - Identity (D7: GitHub's private email, so her own email stays out of the CRM's history). Set only what is
+    missing; a name or email she already has stays as it is. Read
+    `<mise> exec -- gh api user --jq '.login, .id, (.name // .login)'`. Then, for each field that
+    `git config --global user.name` / `git config --global user.email` prints nothing for:
     `git config --global user.name "<name>"` and
     `git config --global user.email "<id>+<login>@users.noreply.github.com"`.
+    Both already set → change nothing and say one line: "Your Mac already knows who you are; keeping it."
   - Explain these as "telling the Mac who you are on GitHub".
 - Remember `<login>`; step 6 uses it.
 
 ## 6. Access to the CRM
-- Check: `~/.local/bin/mise exec -- gh api repos/ngtongsheng/gq-projects-crm --jq .permissions.push` prints `true` → skip.
+- Check: `<mise> exec -- gh api repos/ngtongsheng/gq-projects-crm --jq .permissions.push` prints `true` → skip.
 - Look for an invitation:
-  `~/.local/bin/mise exec -- gh api user/repository_invitations --jq '.[] | select(.repository.full_name == "ngtongsheng/gq-projects-crm") | .id'`
+  `<mise> exec -- gh api user/repository_invitations --jq '.[] | select(.repository.full_name == "ngtongsheng/gq-projects-crm") | .id'`
 - Found an id → explain "Tong Sheng invited you to the CRM; I'll accept it", then
-  `~/.local/bin/mise exec -- gh api -X PATCH user/repository_invitations/<id>`. Verify with the check above.
+  `<mise> exec -- gh api -X PATCH user/repository_invitations/<id>`. Verify with the check above.
 - No id → tell her: "Send your GitHub username, **<login>**, to Tong Sheng, and tell me when he replies." Ask
   (AskUserQuestion) "Has Tong Sheng replied?" **Yes, he replied** / **Not yet**. Yes → run this step again from the
   check. Not yet → ask again later; this is waiting, not a failure.
@@ -120,10 +131,10 @@ message again whenever you're ready." and stop.
 ## 8. Install the CRM's tools
 - Explain: "Installing what the CRM needs to run. This takes a few minutes."
 - Act, in order (each is safe to repeat; no separate check needed):
-  1. `~/.local/bin/mise trust ~/GQ/gq-projects-crm/mise.toml`
-  2. `cd ~/GQ/gq-projects-crm && ~/.local/bin/mise install`
-  3. `cd ~/GQ/gq-projects-crm && ~/.local/bin/mise exec -- pnpm install`
-- Verify: `cd ~/GQ/gq-projects-crm && ~/.local/bin/mise exec -- node --version && ~/.local/bin/mise exec -- pnpm --version` both succeed.
+  1. `<mise> trust ~/GQ/gq-projects-crm/mise.toml`
+  2. `cd ~/GQ/gq-projects-crm && <mise> install`
+  3. `cd ~/GQ/gq-projects-crm && <mise> exec -- pnpm install`
+- Verify: `cd ~/GQ/gq-projects-crm && <mise> exec -- node --version && <mise> exec -- pnpm --version` both succeed.
 
 ## 9. Hand-off
 Say, then stop:
