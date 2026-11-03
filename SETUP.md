@@ -30,6 +30,19 @@ and you'll press **Allow** a few times. Tong Sheng can help if anything gets stu
 Ask (AskUserQuestion) "Ready to start?" with options **Yes** / **Not now**. Not now: say "No problem. Paste the same
 link again whenever you're ready." and stop.
 
+## 0b. Check this Mac
+- Check (both only read, neither opens a window): `sw_vers -productVersion` and `id -Gn`.
+  - The Mac is new enough when the version is 13.5 or higher (the CRM's tools need it: Node 24 supports macOS 13.5
+    and up). Compare numbers, not text: 14.1.1 and 15.0 pass, 13.4 and 12.7 fail.
+  - The account is an admin when `id -Gn` lists the word `admin`.
+- Both pass → one status line: "Step 0b of 14 done: this Mac is ready." Continue to step 1.
+- Mac too old → say: "This Mac needs a system update before the CRM's tools will fit. Please tell Tong Sheng; he'll
+  help with the update. Nothing is broken." Then stop.
+- Not an admin → say: "This Mac account can't install Apple's tools, which the CRM needs. Please ask whoever looks
+  after this Mac, or Tong Sheng, to make your account an administrator." Then stop.
+- Both fail → say both messages in one, then stop.
+- Stopping here is not a failure of a step; she can paste the setup link again once it is fixed.
+
 ## 1. Apple developer tools (includes git)
 - Check: `xcode-select -p`. Exit 0 → already done; skip to step 2. (This check never opens a popup; `git --version`
   can, so use `xcode-select -p`.)
