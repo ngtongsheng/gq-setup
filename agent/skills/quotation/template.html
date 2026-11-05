@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Quotation $number</title>
+<style>
+@page { size: A4; margin: 16mm 14mm 18mm; @bottom-right { content: counter(page); font: 7pt sans-serif; color: #bbb; } }
+* { box-sizing: border-box; }
+body { margin: 0; font: 9pt/1.45 "Open Sans", "Helvetica Neue", Arial, sans-serif; color: #333; }
+.muted { color: #777; }
+.head { display: flex; justify-content: space-between; }
+.logo { width: 72px; }
+.title { text-align: right; }
+.title h1 { margin: 0; font-weight: 400; font-size: 30pt; color: #111; }
+.title .no { font-weight: 700; color: #777; font-size: 10pt; }
+.company { margin-top: 4px; }
+.company b { color: #222; }
+.parties { display: flex; justify-content: space-between; margin: 28px 0 18px; }
+.billto { font-size: 9.5pt; }
+.billto .label { color: #777; font-size: 10pt; }
+.meta td { padding: 3px 0 3px 16px; text-align: right; vertical-align: top; font-size: 10pt; }
+.meta td:first-child { color: #777; }
+.meta td:last-child { max-width: 160px; }
+table.items { width: 100%; border-collapse: collapse; }
+.items th { background: #3b3b3b; color: #fff; font-weight: 400; font-size: 10pt; padding: 8px; text-align: left; }
+.items td { padding: 12px 8px; vertical-align: top; border-bottom: 1px solid #ddd; }
+.items tr { break-inside: avoid; }
+.r { text-align: right; }
+.unit { color: #777; }
+.photo { width: 56px; padding-right: 0 !important; }
+.photo img { width: 50px; }
+.product .name { color: #222; }
+.product .lines { color: #777; }
+.total { display: flex; justify-content: flex-end; }
+.total div { background: #f4f3f1; width: 50%; display: flex; justify-content: flex-end; gap: 60px; padding: 12px 12px 22px; font-weight: 700; font-size: 10pt; color: #222; }
+h2 { font-weight: 400; color: #777; font-size: 11pt; margin: 36px 0 8px; }
+.notes p, .terms p { margin: 0 0 12px; }
+.accept { margin-top: 26px; color: #777; font-size: 11pt; }
+.accept span { display: inline-block; width: 230px; border-bottom: 1.5px solid #222; }
+</style></head>
+<body>
+<div class="head">
+  <div><img class="logo" src="$logo" alt="GQ Projects">
+    <div class="company muted"><b>$companyName ($registration)</b><br>$companyAddress<br>$phone<br>$website</div></div>
+  <div class="title"><h1>Quotation</h1><div class="no"># $number</div></div>
+</div>
+<div class="parties">
+  <div class="billto"><div class="label">Bill to:</div><b>$customerName</b><br>$customerAddress</div>
+  <table class="meta">
+    <tr><td>Estimate date :</td><td>$estimateDate</td></tr>
+    <tr><td>Expiry date :</td><td>$expiryDate</td></tr>
+    <tr><td>Project name :</td><td>$project</td></tr>
+    <tr><td>Salesperson :</td><td>$salesperson</td></tr>
+  </table>
+</div>
+<table class="items">
+  <tr><th style="width:52px">Item</th><th colspan="2">Product &amp; Sku</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr>
+  $rows
+</table>
+<div class="total"><div><span>total</span><span>$total</span></div></div>
+<h2>Note</h2>
+<div class="notes">$notes</div>
+<h2>Terms &amp; Conditions</h2>
+<div class="terms">$terms</div>
+<div class="accept">Acknowledge of acceptance <span></span></div>
+</body></html>

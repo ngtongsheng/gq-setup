@@ -1,0 +1,31 @@
+{
+  "name": "GQ Projects Sdn Bhd",
+  "registration": "896203-P",
+  "address": ["D-1-13 & 15, Capital 4, Oasis Square,", "Petaling Jaya", "47301 Selangor"],
+  "phone": "T/F: 03 7480 0748",
+  "website": "www.gqprojects.com.my",
+  "currency": "MYR",
+  "validMonths": 1,
+  "leadTime": [
+    "Indent carpet tile: 4-8 weeks",
+    "Upon official confirmation, artwork signed off and received of down payment."
+  ],
+  "paymentTerms": [
+    "Material: 50% down payment, balance upon delivery.",
+    "Labour: 50% down payment, balance progress claim"
+  ],
+  "bank": "CIMB: 800 824 8221 GQ PROJECTS SDN BHD",
+  "contact": "Vicky Lee 012 202 3925 vicky.gqprojects@gmail.com",
+  "terms": [
+    ["Non-Returnable Goods", "All goods sold are non-returnable."],
+    ["Ownership of Goods", "Ownership of goods remains with GQ Projects Sdn Bhd until full payment is received."],
+    ["Estimated wastage rate are:", "Carpet Tile/Vinyl Tile: 5-7%; Carpet Roll: 10-15%; Custom Design/vinyl sheet: 15-25%\nWaste disposal is not included in the quoted price and shall be borne by the client. A join site measurement will be conducted to determine the appropriate material quantity."],
+    ["Custom Orders", "Custom-made or fabricated designs require client approval before production. The final billing quantity must be verified prior to production."],
+    ["Subfloor Preparation", "The subfloor must be properly prepared to receive carpet or vinyl, including thorough cleaning, leveling, and ensuring it is free from cracks, moisture, oil, paint, or any other contaminants."],
+    ["Price Fluctuations", "Pricing is subject to change based on fluctuations in the USD exchange rate."],
+    ["Modifications to Quotation", "Any changes or alterations to the original quotation must be approved in writing by both parties."],
+    ["Additional Work & Cost", "Any additional work required due to unforeseen circumstances (e.g., subfloor repairs) will be charged separately."],
+    ["Floor Protection", "Unless explicitly stated in the quotation, floor protection is not included in the pricing."],
+    ["Liability & Maintenance", "GQ Projects Sdn Bhd is not liable for damages resulting from non-standard wear and tear, improper maintenance, or misuse of the installed flooring."]
+  ]
+}
