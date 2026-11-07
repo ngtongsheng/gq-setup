@@ -30,15 +30,19 @@ and the issue always lands where Tong Sheng looks.
 1. Write the report with the Write tool to `$HOME/GQ/.help-report.md` (written as an absolute path; it sits outside
    every repository so it can never be committed, and is overwritten each time), so log lines with quotes survive
    intact.
-2. Pick the label: `from:crm` when `pwd` is inside `~/GQ/gq-projects-crm`, otherwise `from:other`. Make sure it exists:
+2. Attach the bundle: run `node "$HOME/GQ/gq-setup/agent/scripts/help-bundle.mjs" --append`. It adds two collapsed
+   blocks to the report: a diagnosis of her machine and repo, and her current session, condensed with secrets
+   redacted. It takes up to 10 seconds. Done when it prints "help bundle appended". If it fails, file the report
+   without it. Leave the appended blocks exactly as written.
+3. Pick the label: `from:crm` when `pwd` is inside `~/GQ/gq-projects-crm`, otherwise `from:other`. Make sure it exists:
    `gh label create "<label>" -R ngtongsheng/gq-projects-crm --force`.
-3. Look for an open report on the same problem: `gh issue list -R ngtongsheng/gq-projects-crm --assignee ngtongsheng
+4. Look for an open report on the same problem: `gh issue list -R ngtongsheng/gq-projects-crm --assignee ngtongsheng
    --state open --search "<branch or short problem>"`.
    Found: `gh issue comment <n> -R ngtongsheng/gq-projects-crm --body-file "$HOME/GQ/.help-report.md"`.
-4. Otherwise: `gh issue create -R ngtongsheng/gq-projects-crm --assignee ngtongsheng --label "<label>" --title "Help:
+5. Otherwise: `gh issue create -R ngtongsheng/gq-projects-crm --assignee ngtongsheng --label "<label>" --title "Help:
    <short problem>" --body-file "$HOME/GQ/.help-report.md"`. Start the title with "Urgent:" instead of "Help:" when
    the live app is affected.
-5. Done when the command prints the issue link. If `gh` itself fails (offline, signed out), skip the report and tell
+6. Done when the command prints the issue link. If `gh` itself fails (offline, signed out), skip the report and tell
    her: "I couldn't reach Tong Sheng automatically. Please message him that your change is stuck."
 
 ## 3. Tell her
