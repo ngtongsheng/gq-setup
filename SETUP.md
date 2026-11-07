@@ -168,7 +168,7 @@ link again whenever you're ready." and stop.
 
 ## 11. Set up Claude for you
 - Explain: "Now I'll set Claude up to work the GQ way, on every chat."
-- Act: `/usr/bin/python3 ~/GQ/gq-setup/agent/apply.py` (safe to repeat; it only adds what is missing).
+- Act: `cd ~/GQ/gq-projects-crm && <mise> exec -- node ~/GQ/gq-setup/agent/apply.mjs` (safe to repeat; it only adds what is missing).
 - Verify: the command succeeds, and
   `grep -qxF '@~/GQ/gq-setup/agent/CLAUDE.md' ~/.claude/CLAUDE.md && test -L ~/.claude/output-styles/plain.md`
   succeeds.
