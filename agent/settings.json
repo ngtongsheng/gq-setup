@@ -33,7 +33,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/usr/bin/python3 \"$HOME/GQ/gq-setup/agent/apply.py\" --quiet",
+            "command": "node \"$HOME/GQ/gq-setup/agent/apply.mjs\" --quiet",
             "timeout": 20
           }
         ]
