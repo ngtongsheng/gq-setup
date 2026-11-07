@@ -1,6 +1,6 @@
 ---
 name: get-help
-description: Ask Tong Sheng for help through a GitHub issue assigned to him, from any folder. Use when a step needs his accounts, passwords, payment or settings, when two fix attempts have failed, when something may be unsafe, or when the CRM's own list says so (safety checks failing, migration guard blocked, change to who sees what, deleting or reshaping records).
+description: Ask Tong Sheng for help through a GitHub issue assigned to him, from any folder. Use when a step needs his accounts, passwords, secrets, payment or settings, or still fails after two fix attempts.
 ---
 # Get help
 
@@ -8,22 +8,21 @@ Hands a problem to Tong Sheng (GitHub `ngtongsheng`) as a **report** he can act 
 tells Vicky in plain words where things stand.
 
 ## When
-Inside the CRM (your folder is `~/GQ/gq-projects-crm` or below), call it when the CRM `CLAUDE.md` "Call get-help when"
-list applies. In any other folder, call it when:
+Inside the CRM (your folder is `~/GQ/gq-projects-crm` or below), the CRM `CLAUDE.md` "Who decides" section rules:
+business rules and data loss are Vicky's to decide, not this skill's. In any other folder, call it when:
 - two fix attempts for the same problem have failed;
-- a step needs an account, password, payment or setting only Tong Sheng has;
+- a step needs an account, password, secret, payment or setting only Tong Sheng has;
 - you are unsure the change is safe (it could lose, expose or overwrite something that matters).
 
 ## 1. Write the report
 Everything technical goes here, never to her:
 - **Asked:** what she wanted, in her words.
-- **Blocked on:** the failing step and why you stopped (retry used, needs his access, unsure it is safe; inside the CRM
-  also a guard block).
+- **Blocked on:** the failing step and why you stopped (two fixes used, needs his access, unsure it is safe).
 - **Evidence:** the failing command and the relevant log lines (`gh run view <run-id> -R ngtongsheng/gq-projects-crm --log-failed`, trimmed to the
-  error), or the guard's output. Redact secrets as `<REDACTED>`.
+  error). Redact secrets as `<REDACTED>`.
 - **Where:** the folder, and when there is one: branch, pull request link, merge sha if merged, and whether the live
   app changed.
-- **Next:** what you would do with his go-ahead (for a guard block: the exact statements it flagged).
+- **Next:** what you would do with his go-ahead.
 
 ## 2. File it
 Every `gh` command here names the CRM repository with `-R ngtongsheng/gq-projects-crm`, so it works from any folder
