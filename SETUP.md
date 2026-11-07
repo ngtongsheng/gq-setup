@@ -1,6 +1,6 @@
 # GQ setup: instructions for Claude
 
-You are setting up a Mac for someone at GQ Projects so they can run the GQ CRM from Claude Desktop. She is not
+You are setting up a computer (a Mac or a Windows PC) for someone at GQ Projects so they can run the GQ CRM from Claude Desktop. She is not
 technical. You do all the work; she reads, presses **Allow**, and answers questions. Follow the steps below in order.
 
 This file is safe to re-run. People paste the same message again when something went wrong, so every step checks
@@ -17,6 +17,12 @@ first and skips when it is already done. Re-running is the repair path.
 - Show her command output only when she has to act on it (the sign-in code in step 6).
 
 ## How to run commands
+- Pick the path from the Platform line of your environment info: `darwin` is the **Mac** path, `win32` the **Windows**
+  path. Steps with no Mac or Windows label are shared. In a labelled step run only the bullets for her path; the
+  Mac bullets stay off the Windows path and the reverse.
+- Windows: commands marked **PowerShell** run with the PowerShell tool. Every other command runs with the Bash tool,
+  which is Git Bash (step 1 makes sure it exists). In Git Bash `~` is her home folder (`C:\Users\<name>`), so the
+  shared `~/GQ/...` paths land in `C:\Users\<name>\GQ`.
 - Your shell may not load her profile, so tools from earlier steps are not on the path. Step 2 finds mise and fixes
   its absolute path as `<mise>`. From then on write that path in place of `<mise>` in every command, and run every
   other tool it provides through it: `<mise> exec -- gh ...`. Shell state does not carry between commands, so the
@@ -30,7 +36,8 @@ and you'll press **Allow** a few times. Tong Sheng can help if anything gets stu
 Ask (AskUserQuestion) "Ready to start?" with options **Yes** / **Not now**. Not now: say "No problem. Paste the same
 link again whenever you're ready." and stop.
 
-## 0b. Check this Mac
+## 0b. Check this computer
+### Mac
 - Check (both only read, neither opens a window): `sw_vers -productVersion` and `id -Gn`.
   - The Mac is new enough when the version is 13.5 or higher (the CRM's tools need it: Node 24 supports macOS 13.5
     and up). Compare numbers, not text: 14.1.1 and 15.0 pass, 13.4 and 12.7 fail.
@@ -41,9 +48,22 @@ link again whenever you're ready." and stop.
 - Not an admin → say: "This Mac account can't install Apple's tools, which the CRM needs. Please ask whoever looks
   after this Mac, or Tong Sheng, to make your account an administrator." Then stop.
 - Both fail → say both messages in one, then stop.
-- Stopping here is not a failure of a step; she can paste the setup link again once it is fixed.
 
-## 1. Apple developer tools (includes git)
+### Windows
+- Check (both only read), **PowerShell**: `[Environment]::OSVersion.Version.Build` and `winget --version`.
+  - The PC is new enough when the build number is 17763 or higher (Windows 10 version 1809 and up, which the CRM's
+    tools need).
+  - Windows' own installer is there when `winget --version` prints a version.
+- Both pass → one status line: "Step 0b of 14 done: this computer is ready." Continue to step 1.
+- Build too low → say: "This computer needs a Windows update before the CRM's tools will fit. Please tell Tong Sheng;
+  he'll help with the update. Nothing is broken." Then stop.
+- No `winget` → say: "This computer is missing Windows' own installer app, which the CRM's tools need. Please tell
+  Tong Sheng; he'll help add it. Nothing is broken." Then stop.
+
+Stopping here is not a failure of a step; she can paste the setup link again once it is fixed.
+
+## 1. Git
+### Mac: Apple developer tools (includes git)
 - Check: `xcode-select -p`. Exit 0 → already done; skip to step 2. (This check never opens a popup; `git --version`
   can, so use `xcode-select -p`.)
 - Explain: "Your Mac needs Apple's free developer tools. Apple will show its own window."
@@ -53,7 +73,28 @@ link again whenever you're ready." and stop.
   No window: run `xcode-select --install` once more and ask again.
 - Verify: `xcode-select -p && git --version` both succeed.
 
+### Windows: Git for Windows
+Git for Windows also brings Git Bash, which Claude needs for its Bash tool and the GQ settings.
+- Check: you have a Bash tool in this session → Git is installed and Claude found it; skip to step 2.
+- No Bash tool. Check, **PowerShell**: `Test-Path "$env:ProgramFiles\Git\bin\bash.exe"`.
+  - `True` → Git is installed but Claude started before it was. Go to the restart below.
+  - `False` → install it:
+    - Check, **PowerShell**: `whoami /groups | Select-String 'S-1-5-32-544'` prints a line → her account is an
+      administrator. Prints nothing → say: "This Windows account can't install programs, which the CRM needs. Please
+      ask whoever looks after this computer, or Tong Sheng, to make your account an administrator." Then stop.
+    - Explain: "Your computer needs Git, a free tool the CRM is stored with. Windows will ask whether to allow it."
+    - Act, **PowerShell**:
+      `winget install --id Git.Git --exact --source winget --silent --accept-package-agreements --accept-source-agreements`.
+      Tell her first: "A Windows box asks 'Do you want to allow this app to make changes to your device?'. Press
+      **Yes**."
+    - Verify, **PowerShell**: `Test-Path "$env:ProgramFiles\Git\bin\bash.exe"` prints `True`.
+- Restart: Claude only finds Git after it restarts. Say: "Git is ready. Claude needs a quick restart to see it. Right-click
+  the Claude icon near the clock at the bottom right of the screen and choose **Quit** (no icon there? close the Claude
+  window). Open **Claude** again, choose the **Code** tab and the **GQ** folder, and paste the same setup link. I'll
+  carry on from step 2." Then stop.
+
 ## 2. mise (installs the tools the CRM needs)
+### Mac
 - Check: find an existing mise, first hit wins:
   `for p in "$(command -v mise)" ~/.local/bin/mise /opt/homebrew/bin/mise /usr/local/bin/mise; do [ -n "$p" ] && [ -x "$p" ] && { echo "$p"; break; }; done`
   (the last two cover a mise she already had, which a shell without her profile cannot see). A path printed → that
@@ -70,6 +111,22 @@ link again whenever you're ready." and stop.
 
   Explain these together as "two lines so your Mac finds the new tools next time".
 
+### Windows
+- Check: find an existing mise, first hit wins:
+  `for p in "$(command -v mise)" ~/.local/bin/mise.exe ~/AppData/Local/Microsoft/WinGet/Links/mise.exe; do [ -n "$p" ] && [ -x "$p" ] && { echo "$p"; break; }; done`
+  (the last one covers a mise she installed herself with winget). A path printed → that is `<mise>`; skip the install,
+  go to the shims line below. Nothing printed → install.
+- Explain: "Now a small helper that installs the CRM's tools into your own user folder. No password needed."
+- Act, **PowerShell**: `irm https://mise.run/powershell | iex`. Then `<mise>` is `~/.local/bin/mise.exe`, written
+  out in full (`/c/Users/<name>/.local/bin/mise.exe`).
+- Verify: `<mise> --version`.
+- Shims folder `<shims>`: `$HOME/AppData/Local/mise/shims`, or `$MISE_DATA_DIR/shims` when `MISE_DATA_DIR` is set.
+  Step 6 uses it.
+- Shims line, so her own sessions and Claude's GQ settings find the tools (safe to repeat: it adds the folder to her
+  Windows user path only when it is missing). Act, **PowerShell**:
+  `$shims = if ($env:MISE_DATA_DIR) { "$env:MISE_DATA_DIR\shims" } else { "$env:LOCALAPPDATA\mise\shims" }; $userPath = [Environment]::GetEnvironmentVariable('Path', 'User'); if (($userPath -split ';') -notcontains $shims) { [Environment]::SetEnvironmentVariable('Path', "$shims;$userPath", 'User') }`
+  Explain it as "one setting so your computer finds the new tools next time".
+
 ## 3. GitHub tool
 - Check: `<mise> exec -- gh --version`. Success → skip.
 - Explain: "Next, the tool that talks to GitHub, where the CRM is stored."
@@ -77,6 +134,8 @@ link again whenever you're ready." and stop.
 - Verify: `<mise> exec -- gh --version`.
 
 ## 4. rtk (keeps Claude's work tidy)
+- Windows: not used; GQ's settings switch it on only on a Mac. Say "Step 4 of 14 not needed on this computer." and go
+  to step 5.
 - Check: `<mise> exec -- rtk --version`. Success → skip.
 - Explain: "Next, a small helper that keeps Claude quick and tidy while it works."
 - Act: `<mise> use -g rtk`
@@ -86,7 +145,7 @@ link again whenever you're ready." and stop.
 - Check: `<mise> exec -- gh auth status` succeeds → she already has an account and is signed in; skip to
   step 6.
 - Ask (AskUserQuestion) "Do you have a GitHub account?" **Yes** / **No, let's make one**.
-- No: run `open https://github.com/signup` (explain: "I'll open the GitHub sign-up page in your browser"), then give
+- No: run `open https://github.com/signup` (Windows, **PowerShell**: `Start-Process https://github.com/signup`) (explain: "I'll open the GitHub sign-up page in your browser"), then give
   these steps one message at a time, waiting for "done" after each:
   1. Type your work email and press **Continue**.
   2. Make a password and press **Continue**.
@@ -98,12 +157,13 @@ link again whenever you're ready." and stop.
 
   Then say: "Your GitHub account is ready."
 
-## 6. Sign in to GitHub on this Mac
+## 6. Sign in to GitHub on this computer
 - Check: `<mise> exec -- gh auth status` succeeds → skip the sign-in, go to git setup below.
-- Explain: "Now I'll connect this Mac to your GitHub account. Your browser opens, and you'll see an 8-character code."
+- Explain: "Now I'll connect this computer to your GitHub account. Your browser opens, and you'll see an 8-character code."
 - Act: run `<mise> exec -- gh auth login --web --hostname github.com --git-protocol https --clipboard` in the
   background (`run_in_background`), because it waits until she finishes in the browser. Read its output for the code
-  (`XXXX-XXXX`) and the address `https://github.com/login/device`. Run `open https://github.com/login/device`.
+  (`XXXX-XXXX`) and the address `https://github.com/login/device`. Run `open https://github.com/login/device` (Windows, **PowerShell**:
+  `Start-Process https://github.com/login/device`).
 - Tell her, showing the code in bold: "Your code is **XXXX-XXXX** (it's already copied). In the browser page, paste
   it, press **Continue**, then the green **Authorize** button. Tell me when the page says you're all set."
 - Wait for the background command to finish. Verify: `<mise> exec -- gh auth status` succeeds.
@@ -120,8 +180,9 @@ link again whenever you're ready." and stop.
     `git config --global user.name` / `git config --global user.email` prints nothing for:
     `git config --global user.name "<name>"` and
     `git config --global user.email "<id>+<login>@users.noreply.github.com"`.
-    Both already set → change nothing and say one line: "Your Mac already knows who you are; keeping it."
-  - Explain these as "telling the Mac who you are on GitHub".
+    Both already set → change nothing and say one line: "Your computer already knows who you are; keeping it."
+  - Windows: `git config --global core.autocrlf false`, so the CRM's files keep the line endings its checks expect.
+  - Explain these as "telling the computer who you are on GitHub".
 - Remember `<login>` and the person's first name (`<first name>`, the first word of the name read above); steps 7 and 13 use them.
 
 ## 7. Access to the CRM
@@ -164,14 +225,16 @@ link again whenever you're ready." and stop.
   1. `<mise> trust ~/GQ/gq-projects-crm/mise.toml`
   2. `cd ~/GQ/gq-projects-crm && <mise> install`
   3. `cd ~/GQ/gq-projects-crm && <mise> exec -- pnpm install`
-- Verify: `cd ~/GQ/gq-projects-crm && <mise> exec -- node --version && <mise> exec -- pnpm --version` both succeed.
+  4. `<mise> use -g node@24` (Claude's GQ settings start with `node` in any folder, so it must work outside the CRM too)
+- Verify: `cd ~/GQ/gq-projects-crm && <mise> exec -- node --version && <mise> exec -- pnpm --version` both succeed,
+  and `cd ~ && <mise> exec -- node --version` succeeds.
 
 ## 11. Set up Claude for you
 - Explain: "Now I'll set Claude up to work the GQ way, on every chat."
 - Act: `cd ~/GQ/gq-projects-crm && <mise> exec -- node ~/GQ/gq-setup/agent/apply.mjs` (safe to repeat; it only adds what is missing).
 - Verify: the command succeeds, and
   `grep -qxF '@~/GQ/gq-setup/agent/CLAUDE.md' ~/.claude/CLAUDE.md && test -L ~/.claude/output-styles/plain.md`
-  succeeds.
+  succeeds. Windows: the same with `test -e` in place of `test -L` (Windows may get a copy instead of a link).
 - Lines it prints beginning `gq apply:` are warnings. Say one plain line: "Claude is set up; one small thing is
   worth showing Tong Sheng." Keep the warning text for the failure message; show it to her only if she asks.
 
@@ -180,11 +243,13 @@ Claude's Chat tab does not read the GQ rules from files, so she pastes a short t
 - Check: ask (AskUserQuestion) "Did you already paste the GQ text into your Claude profile?" **Yes, already done** /
   **Not yet**. Yes → skip.
 - Explain: "The Chat tab needs a short GQ text in your profile. I've copied it; you'll paste it."
-- Act: `pbcopy < ~/GQ/gq-setup/agent/chat-profile.md`. Then give these steps together:
+- Act: Mac: `pbcopy < ~/GQ/gq-setup/agent/chat-profile.md`. Windows, **PowerShell**:
+  `Get-Content -Raw -Encoding UTF8 "$HOME\GQ\gq-setup\agent\chat-profile.md" | Set-Clipboard`.
+  Then give these steps together:
   1. In Claude, click your name or initials at the bottom left, then **Settings**.
   2. Choose **Profile** (some versions call it **Your Claude**).
   3. Click the box for your preferences or instructions. If it already has your own text, click below it.
-  4. Press **Command + V** to paste, then press **Save** if there is a Save button.
+  4. Press **Command + V** (Windows: **Ctrl + V**) to paste, then press **Save** if there is a Save button.
 - Verify: ask (AskUserQuestion) "Is the text pasted and saved?" **Yes, it's saved** / **I can't find the box**.
   No box → ask what the Settings window shows and guide her from it; if it still fails, follow
   [When a step fails twice](#when-a-step-fails-twice).
@@ -214,7 +279,9 @@ Claude's Chat tab does not read the GQ rules from files, so she pastes a short t
 Say, then stop:
 
 "All set! Your computer is ready. Last part, to open the CRM:
-1. Quit Claude completely: press **Command + Q**. Then open **Claude** again.
+1. Quit Claude completely, then open **Claude** again. <Mac: "press **Command + Q**"; Windows: "right-click the
+   Claude icon near the clock at the bottom right of the screen and choose **Quit** (no icon there? close the Claude
+   window)">.
 2. Choose the **Code** tab.
 3. Press the folder button next to the message box and choose the folder **GQ**, then **gq-projects-crm**.
 4. Type: **show me the app**

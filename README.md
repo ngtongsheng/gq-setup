@@ -7,8 +7,9 @@
 ## For you
 
 1. Open **Claude** and choose the **Code** tab.
-2. Choose your `GQ` folder. No folder yet? Open **Finder**, choose **Go**, then **Home**, then **File**, then
-   **New Folder**, and name it `GQ`.
+2. Choose your `GQ` folder. No folder yet? On a Mac, open **Finder**, choose **Go**, then **Home**, then **File**,
+   then **New Folder**, and name it `GQ`. On Windows, open **File Explorer**, type `%USERPROFILE%` in the address bar
+   and press Enter, then choose **New**, then **Folder**, and name it `GQ`.
 3. Paste this link into the message box and press Enter:
 
    ```
